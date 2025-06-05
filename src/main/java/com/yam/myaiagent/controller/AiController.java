@@ -1,6 +1,7 @@
 package com.yam.myaiagent.controller;
 
 import com.yam.myaiagent.agent.MyManus;
+import com.yam.myaiagent.agent.MyManusDeepThinking;
 import com.yam.myaiagent.app.LoveApp;
 import com.yam.myaiagent.app.UIApp;
 import jakarta.annotation.Resource;
@@ -66,6 +67,20 @@ public class AiController {
     }
 
 
+
+    /**
+     * SSE 流式调用 cook 大师 应用
+     *
+     * @param message
+     * @param chatId
+     * @return
+     */
+    @GetMapping(value = "/cook/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> doChatWithCookSSE(String message, String chatId) {
+        return uiApp.doChatByStream(message, chatId);
+    }
+
+
     /**
      * SSE 流式调用 AI 恋爱大师应用
      *
@@ -107,7 +122,7 @@ public class AiController {
     }
 
     /**
-     * 流式调用 Manus 超级智能体
+     * 流式调用 Manus 超级智能体（原版多步骤模式）
      * @param message
      * @return
      */
@@ -115,6 +130,17 @@ public class AiController {
     public SseEmitter doChatWithManus(String message) {
         MyManus yuManus = new MyManus(allTools, dashscopeChatModel);
         return yuManus.runStream(message);
+    }
+
+    /**
+     * 流式调用 Manus 超级智能体（深度思考模式）
+     * @param message
+     * @return
+     */
+    @GetMapping("/manus/chat/deep-thinking")
+    public SseEmitter doChatWithManusDeepThinking(String message) {
+        MyManusDeepThinking yuManusDeepThinking = new MyManusDeepThinking(allTools, dashscopeChatModel);
+        return yuManusDeepThinking.runStream(message);
     }
 
 
